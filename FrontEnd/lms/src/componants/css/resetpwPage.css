@@ -1,0 +1,104 @@
+
+
+.prp_card-container1 {
+    display: flex;
+    flex-direction: column;
+   
+  }
+  
+  .prp_content-wrap {
+    background-image: url('background.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ecf0f1;
+    padding: 20px;
+    padding-top: 500xp;
+    flex: 1; /* Allows the content wrap to grow and push the footer down */
+  }
+  
+  .prp_formpage {
+    background: linear-gradient(to right, #b4b0af, #e9e3de);
+    align-items: center;
+    display: flex;
+    width: 200px;
+    height: 350px;
+    flex-direction: column;
+    padding: 30px;
+    padding-top: 50px;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .prp_formpage:hover {
+    transform: scale(1.05);
+  }
+  
+  .prp_h1 {
+    font-family: 'Times New Roman', Times, serif;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+    font-size: 24px;
+  }
+  
+  .prp_labels {
+    font-size: 18px;
+    font-family: 'Times New Roman', Times, serif;
+    text-align: left;
+    width: 100%;
+    margin-bottom: 10px;
+    color: #555;
+  }
+  
+  .prp_formpage input[type="text"],
+  .prp_formpage input[type="password"] {
+    width: calc(100% - 22px);
+    padding: 10px 10px;
+    margin: 10px 0;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+    color: red;
+    transition: border-color 0.3s ease-in-out;
+  }
+  
+  .prp_formpage input[type="text"]:focus,
+  .prp_formpage input[type="password"]:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+  
+  
+  
+  .prp_p1 {
+    font-size: 12px;
+    color: #007bff;
+    margin-bottom: 5px;
+  }
+  
+ 
+
+  
+  .submit {
+    
+    font-size: 12px;
+    margin-bottom: 100px;
+    border-radius: 10px;
+    color: whitesmoke;
+    background-color: #007bff;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+  }
+  
+  .submit:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+  }
+  

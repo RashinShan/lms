@@ -1,0 +1,67 @@
+.footer {
+  display: flex;
+  justify-content: space-around;
+  background: linear-gradient(to right, #cac3d3, #4378d4);
+  padding: 20px;
+  color: rgb(255, 255, 255);
+  font-family: Arial, sans-serif;
+  box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.footer-section {
+  flex: 1;
+  margin: 10px;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+}
+
+.footer-section h3 {
+  margin-bottom: 15px;
+  font-size: 24px;
+  color: #082b68;
+}
+
+.footer-contact p,
+.footer-about p,
+.footer-about ul,
+.footer-about li {
+  margin: 5px 0;
+}
+
+.footer-form .footer-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-form form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.footer-form input {
+  width: 80%;
+  padding: 10px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 5px;
+}
+
+.footer-form input::placeholder {
+  color: #888;
+}
+
+.footer-form button {
+  padding: 10px 10px;
+  color: white;
+  background-color: #4CAF50;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.footer-form button:hover {
+  background-color: #45a049;
+}

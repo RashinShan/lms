@@ -1,0 +1,81 @@
+.books {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100px;
+  border-radius: 20px;
+  background: linear-gradient(to right, #b4b0af, #e9e3de);
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.search-bar input {
+  padding: 20px;
+  padding-left: 40px; /* Ensure there's space for the icon */
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  width: 300px;
+}
+
+.search-icon {
+  position:absolute;
+  left: 180px;
+  width: 20px;
+  height: 20px;
+}
+
+table {
+  width: 100%;
+  max-width: 800px;
+  border-collapse: collapse;
+  margin-top: 20px;
+
+}
+
+thead th {
+  background-color: #041629a8;
+  color: #fff;
+  padding: 10px;
+  text-align: left;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #fff;
+}
+
+td {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+button {
+  padding: 6px 12px;
+  font-size: 14px;
+  color: #fff;
+  background-color: #52a1f5;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
