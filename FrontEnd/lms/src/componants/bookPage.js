@@ -7,7 +7,9 @@ function FunctionalComBook() {
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
-        fetch('http://localhost:4000/books')
+        fetch('http://localhost:4000/books', {
+            credentials: 'include',
+        })
             .then(response => response.json())
             .then(data => setBooks(data))
             .catch(error => console.error('Error fetching books:', error));
@@ -19,22 +21,35 @@ function FunctionalComBook() {
 
     const handleToggleSelectBook = async (book) => {
         const endpoint = book.status === 'available' ? 'select' : 'unselect';
-        
+
         try {
             const response = await fetch(`http://localhost:4000/books/${book._id}/${endpoint}`, {
                 method: 'PUT',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
 
             if (!response.ok) {
-                throw new Error('Failed to toggle book selection');
+                const errorMessage = await response.json();
+                alert(errorMessage.message);
+                throw new Error(`Failed to toggle book selection: ${errorMessage.message}`);
             }
 
             const updatedBook = await response.json();
+
             setBooks((prevBooks) =>
-                prevBooks.map((b) => (b._id === updatedBook._id ? updatedBook : b))
+                prevBooks.map((b) => {
+                    if (b._id === updatedBook._id) {
+                        return {
+                            ...b,
+                            status: endpoint === 'select' ? 'unavailable' : 'available',
+                            copies: updatedBook.copies,
+                        };
+                    }
+                    return b;
+                })
             );
         } catch (error) {
             console.error(`Error trying to ${endpoint} book:`, error);

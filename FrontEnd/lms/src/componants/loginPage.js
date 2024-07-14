@@ -17,6 +17,7 @@ function FunctionalComLogin() {
     try {
       const response = await fetch('http://localhost:4000/Login', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
