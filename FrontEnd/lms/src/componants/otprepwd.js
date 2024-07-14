@@ -10,10 +10,10 @@ function FunctionalComLogin() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log("OTP before sending to backend:", otp);
+    
   
     try {
-      const response = await fetch('http://localhost:4000/verify-otpRegistration', {
+      const response = await fetch('http://localhost:4000/verify-otpResetpwd', {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -26,7 +26,7 @@ function FunctionalComLogin() {
       const data = await response.json();
   
       if (response.ok) {
-        navigate('/');
+        navigate('/passwordpage');
       } else {
         alert(data.message);
       }

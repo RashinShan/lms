@@ -10,6 +10,7 @@ import FunctionalComAdmin from './componants/adminPage';
 import FunctionalComAddBook from "./componants/addNewBook";
 import FunctionalComUpdateBook from "./componants/bookUpdate";
 import FunctionalComUserUpdate from "./componants/userUpdate";
+import Functionalotprepwd from "./componants/otprepwd";
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
         <Route path="/addBook" element={<FunctionalComAddBook />} />
         <Route path="/updateBook" element={<FunctionalComUpdateBook />} />
         <Route path="/updateUser" element={<FunctionalComUserUpdate />} />
+        <Route path="/otprepwd" element={<Functionalotprepwd />} />
       </Routes>
     </Router>
       

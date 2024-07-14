@@ -1,18 +1,42 @@
 import React, { useState } from "react";
 import FunctionalComHead from './header/header';
 import FunctionalComFooter from './footer/footer';
+import {Link, useNavigate} from "react-router-dom";
 import './css/password.css';
 
 function FunctionalComPassword() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    if (newPassword === confirmPassword) {
-      alert('Password updated successfully!');
-    } else {
+
+    if (newPassword !== confirmPassword) {
       alert('Passwords do not match!');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:4000/update-password', {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ newPassword }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert(data.message);
+        navigate('/'); 
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error('Error updating password:', error);
+      alert('An error occurred while updating the password. Please try again later.');
     }
   }
 
@@ -33,6 +57,7 @@ function FunctionalComPassword() {
                   placeholder="Enter your new password..."
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
+                  required
                 />
               </div>
 
@@ -44,6 +69,7 @@ function FunctionalComPassword() {
                   placeholder="Confirm your new password..."
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
                 />
               </div>
 

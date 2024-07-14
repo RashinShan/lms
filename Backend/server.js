@@ -202,12 +202,10 @@ app.put('/books/:id/unselect', async (req, res) => {
   }
 });
 
-// Verify OTP route
-app.post('/verify-otp', async (req, res) => {
+// Verify OTP route for registration
+app.post('/verify-otpRegistration', async (req, res) => {
   const { otp } = req.body;
-  console.log("Verification OTP Session ID:", req.session.id);
-  console.log("Session OTP during verification:", req.session.otp);
-  console.log("Received OTP:", otp);
+  
 
   if (req.session.otp === otp) {
     try {
@@ -224,6 +222,76 @@ app.post('/verify-otp', async (req, res) => {
       console.log(error);
       res.status(500).json({ message: 'Server error' });
     }
+  } else {
+    res.status(400).json({ message: 'Invalid OTP.' });
+  }
+});
+
+
+//update pwd
+
+app.put('/update-password', async (req, res) => {
+  const { newPassword } = req.body;
+  const email = req.session.email;
+
+  if (!email) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const user = await User.findOneAndUpdate({ email }, { password: hashedPassword });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+//reset pwd
+
+app.post('/reset-password', async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const otp = generateOTP(); // Generate a temporary password
+    //const hashedPassword = await bcrypt.hash(newPassword, 10);
+    //user.password = hashedPassword;
+    req.session.email = email;
+    req.session.otp = otp;
+
+    // Send the temporary password via email
+    await sendOTP(email, otp);
+
+    res.status(200).json({ message: 'otp code sent to your email' });
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+// Verify OTP route for registration
+app.post('/verify-otpResetpwd', async (req, res) => {
+  const { otp } = req.body;
+  
+
+  if (req.session.otp === otp) {
+    
+      
+      req.session.otp = null;
+
+      res.status(200).json({ message: 'OTP verified .' });
   } else {
     res.status(400).json({ message: 'Invalid OTP.' });
   }

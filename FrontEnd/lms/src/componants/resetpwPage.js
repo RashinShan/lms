@@ -1,16 +1,37 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import FunctionalComHead from './header/header';
 import FunctionalComFooter from './footer/footer';
 import './css/resetpwPage.css';
 
 function FunctionalComLogin() {
-  const [uid, setUid] = useState("");
+  const [email, setEmail] = useState("");
+  const navigate = useNavigate();
 
-
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    alert(`The email you entered was: ${uid} `);
+
+    try {
+      const response = await fetch('http://localhost:4000/reset-password', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert(data.message);
+        navigate('/otprepwd'); 
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      alert('An error occurred while resetting the password. Please try again later.');
+    }
   }
 
   return (
@@ -20,24 +41,23 @@ function FunctionalComLogin() {
         <div className="prp_loginform">
           <form onSubmit={handleSubmit}>
             <div className="prp_formpage">
-              <p class="prp_p1">To reset password enter your user id</p>
-              <h1 className="prp_h1">Reset password </h1>
+              <p className="prp_p1">To reset password, enter your user email</p>
+              <h1 className="prp_h1">Reset Password</h1>
               
               <div className="prp_labels">
-                <label>UserId:</label>
+                <label>Email:</label>
                 <input
-                  type="text"
-                  name="uid"
-                  placeholder="Enter your user id.."
-                  value={uid}
-                  onChange={(e) => setUid(e.target.value)}
+                  type="email"
+                  name="email"
+                  placeholder="Enter your email.."
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
                 />
-                
               </div>
-             
               
               <div className="btn">
-                <input className="submit" type="submit" />
+                <input className="submit" type="submit" value="Reset Password" />
               </div>
             </div>
           </form>
