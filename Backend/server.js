@@ -122,12 +122,12 @@ app.post('/Login', async (req, res) => {
   }
 });
 
-// Book select from user
+
 // Book select route
 app.put('/books/:id/select', async (req, res) => {
   const { id } = req.params;
   const userEmail = req.session.email;
-  console.log(userEmail);
+ 
 
   try {
     const book = await Book.findById(id);
@@ -136,7 +136,7 @@ app.put('/books/:id/select', async (req, res) => {
       return res.status(404).json({ message: 'Book not found' });
     }
 
-    const existingIssuedBook = await BookIssuing.findOne({ issuedUser: userEmail, submittedDate: null });
+    const existingIssuedBook = await BookIssuing.findOne({ issuedUser: userEmail });
 
     if (existingIssuedBook) {
       return res.status(400).json({ message: 'User has already selected a book' });
@@ -149,13 +149,7 @@ app.put('/books/:id/select', async (req, res) => {
       }
       await book.save();
 
-      // Create a new issued book record
-      const newIssuedBook = new BookIssuing({
-        bookName: book.title,
-        issuedUser: userEmail,
-        issuedDate: new Date(),
-      });
-      await newIssuedBook.save();
+      
 
       return res.json(book);
     } else {
@@ -166,6 +160,45 @@ app.put('/books/:id/select', async (req, res) => {
     res.status(500).json({ message: 'Server error', error });
   }
 });
+
+//conferm issued book
+app.put('/books/:id/confirm', async (req, res) => {
+  const { id } = req.params;
+  const userEmail = req.session.email;
+
+  try {
+      const book = await Book.findById(id);
+      if (!book) {
+          return res.status(404).json({ message: 'Book not found' });
+      }
+
+      book.confirmed = true; // Assuming you want to confirm the selection permanently
+      // Create a new issued book record
+      const newIssuedBook = new BookIssuing({
+        bookName: book.title,
+        issuedUser: userEmail,
+        issuedDate: new Date(),
+      });
+
+      const issuedBook = await BookIssuing.findOne({  issuedUser: userEmail });
+
+      if (issuedBook) {
+        return res.status(400).json({ message: 'confermed a selected you cant select again book' });
+      }
+
+      await newIssuedBook.save();
+
+      return res.json(book);
+
+      
+  } catch (error) {
+      console.error('Error confirming book:', error);
+      
+      res.status(500).json({ message: 'Internal server error' });
+
+  }
+});
+
 
 // Book unselect route
 app.put('/books/:id/unselect', async (req, res) => {
@@ -179,10 +212,10 @@ app.put('/books/:id/unselect', async (req, res) => {
       return res.status(404).json({ message: 'Book not found' });
     }
 
-    const issuedBook = await BookIssuing.findOne({ bookName: book.title, issuedUser: userEmail, submittedDate: null });
+    const issuedBook = await BookIssuing.findOne({ bookName: book.title, issuedUser: userEmail });
 
-    if (!issuedBook) {
-      return res.status(400).json({ message: 'User has not selected this book' });
+    if (issuedBook) {
+      return res.status(400).json({ message: 'confermed a selected you cant select again book' });
     }
 
     book.copies += 1;
@@ -191,9 +224,8 @@ app.put('/books/:id/unselect', async (req, res) => {
     }
     await book.save();
 
-    // Update the issued book record
-    issuedBook.submittedDate = new Date();
-    await issuedBook.save();
+  
+   
 
     return res.json(book);
   } catch (error) {
@@ -333,6 +365,36 @@ app.get('/books', async (req, res) => {
   }
 });
 
+
+app.get('/issuedusers', async (req, res) => {
+  try {
+    const books = await BookIssuing.find({});
+    res.status(200).json(books);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+//users 
+app.get('/usersdetails', async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(200).json(users);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ message: 'Failed to fetch users' });
+  }
+});
+
+app.get('/users', async (req, res) => {
+  try {
+    const books = await Book.find({});
+    res.status(200).json(books);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 // Add book issuing route
 app.post('/bookIssuings', async (req, res) => {
   try {
@@ -343,6 +405,142 @@ app.post('/bookIssuings', async (req, res) => {
     res.status(400).send(error);
   }
 });
+
+// Calculate fine based on overdue days
+const calculateFine = (issuedDate, submittedDate) => {
+  const issued = new Date(issuedDate);
+  const submitted = new Date(submittedDate);
+  const diffTime = Math.abs(submitted - issued);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const finePerDay = 1; // Define your fine per day here
+  return diffDays * finePerDay;
+};
+
+app.put('/books/:id/submit', async (req, res) => {
+  const { id } = req.params;
+  const { submittedDate } = req.body;
+
+  try {
+      console.log(`Received request to submit book with ID: ${id}`);
+      const issuedBook = await BookIssuing.findById(id);
+
+      if (!issuedBook) {
+          console.log(`No book found with ID: ${id}`);
+          return res.status(404).json({ message: 'Issued book record not found' });
+      }
+
+      if (issuedBook.submittedDate) {
+          console.log(`Book with ID: ${id} has already been submitted`);
+          return res.status(400).json({ message: 'Book has already been submitted' });
+      }
+
+      issuedBook.submittedDate = submittedDate;
+      issuedBook.fineOrPayment = calculateFine(issuedBook.issuedDate, submittedDate);
+
+      await issuedBook.save();
+
+      console.log(`Book with ID: ${id} submitted successfully`);
+      res.status(200).json({ message: 'Book submitted successfully', fine: issuedBook.fineOrPayment });
+  } catch (error) {
+      console.error('Error submitting book:', error);
+      res.status(500).json({ message: 'Server error' });
+  }
+});
+
+//update books
+
+app.put('/booksupdate/:id', async (req, res) => {
+  const { id } = req.params;
+  const { title, author, copies, status } = req.body;
+
+  try {
+      const book = await Book.findById(id);
+
+      if (!book) {
+          return res.status(404).json({ message: 'Book not found' });
+      }
+
+      book.title = title;
+      book.author = author;
+      book.copies = copies;
+      book.status = status.toLowerCase(); // Ensure status is in lowercase as per schema
+
+      await book.save();
+
+      res.status(200).json({ message: 'Book updated successfully' });
+  } catch (error) {
+      console.error('Error updating book:', error);
+      res.status(500).json({ message: 'Server error' });
+  }
+});
+
+//books delete 
+
+
+app.delete('/books/:id', async (req, res) => {
+  const { id } = req.params;
+  console.log(id);
+
+  try {
+      const deletedBook = await Book.findByIdAndDelete(id);
+
+      if (!deletedBook) {
+          return res.status(404).json({ message: 'Book not found' });
+      }
+
+      res.json({ message: 'Book deleted successfully' });
+  } catch (error) {
+      console.error('Error deleting book:', error);
+      res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+//user delete 
+
+
+app.delete('/deluser/:id', async (req, res) => {
+  const { id } = req.params;
+  console.log(id);
+
+  try {
+      const deletedBook = await User.findByIdAndDelete(id);
+
+      if (!deletedBook) {
+          return res.status(404).json({ message: 'user not found' });
+      }
+
+      res.json({ message: 'user deleted successfully' });
+  } catch (error) {
+      console.error('Error deleting user:', error);
+      res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+//issueduser delete 
+
+
+app.delete('/deleteissueduser/:id', async (req, res) => {
+  const { id } = req.params;
+  console.log(id);
+
+  try {
+      const deletedBook = await BookIssuing.findByIdAndDelete(id);
+
+      if (!deletedBook) {
+          return res.status(404).json({ message: 'issued Book user not found' });
+      }
+
+      res.json({ message: 'issued Book user deleted successfully' });
+  } catch (error) {
+      console.error('Error deleting issued Book user:', error);
+      res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

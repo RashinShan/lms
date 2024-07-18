@@ -15,6 +15,7 @@ const bookIssuingSchema = new mongoose.Schema({
   },
   submittedDate: {
     type: Date,
+    default: null,
   },
   fineOrPayment: {
     type: Number,

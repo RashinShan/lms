@@ -34,9 +34,11 @@ function FunctionalComLogin() {
         navigate('/bookpage'); 
       } else {
         alert(data.message);
+        navigate('/'); 
       }
     } catch (error) {
       alert('Error');
+      navigate('/');
     }
   };
 

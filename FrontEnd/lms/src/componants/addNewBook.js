@@ -31,7 +31,7 @@ function FunctionalComAddBook() {
 
             if (response.ok) {
                 alert('Book added successfully');
-                navigate('/bookpage'); 
+                navigate('/admin'); 
             } else {
                 alert(data.message);
             }

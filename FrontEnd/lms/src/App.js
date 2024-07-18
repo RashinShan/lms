@@ -25,10 +25,12 @@ function App() {
         <Route path="/otp" element={<FunctionalComOTP />} />
         <Route path="/passwordpage" element={<FunctionalComPassword />} />
         <Route path="/bookpage" element={<FunctionalCombook />} />
-        <Route path="/deleteUpdate" element={<FunctionalComAdmin />} />
+        <Route path="/admin" element={<FunctionalComAdmin />} />
         <Route path="/addBook" element={<FunctionalComAddBook />} />
-        <Route path="/updateBook" element={<FunctionalComUpdateBook />} />
+        <Route path="/updateBook/:bookId" element={<FunctionalComUpdateBook />} />
         <Route path="/updateUser" element={<FunctionalComUserUpdate />} />
+        
+
         <Route path="/otprepwd" element={<Functionalotprepwd />} />
       </Routes>
     </Router>

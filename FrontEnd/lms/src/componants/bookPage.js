@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import './css/bookPage.css';
-import searchIcon from './css/search.webp';
+import React, { useState, useEffect } from 'react'; // Import useEffect from React
+import './css/bookPage.css'; // Ensure this path is correct
+import searchIcon from './css/search.webp'; // Ensure this path is correct
 
 function FunctionalComBook() {
     const [books, setBooks] = useState([]);
@@ -20,6 +20,11 @@ function FunctionalComBook() {
     };
 
     const handleToggleSelectBook = async (book) => {
+        if (book.confirmed) {
+            alert('This book selection is confirmed and cannot be changed.');
+            return;
+        }
+
         const endpoint = book.status === 'available' ? 'select' : 'unselect';
 
         try {
@@ -53,6 +58,46 @@ function FunctionalComBook() {
             );
         } catch (error) {
             console.error(`Error trying to ${endpoint} book:`, error);
+        }
+    };
+
+    const handleConfirmBook = async (book) => {
+        alert("Do you need to conferm this book selection");
+        try {
+            const response = await fetch(`http://localhost:4000/books/${book._id}/confirm`, {
+                method: 'PUT',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (response.ok) {
+                
+                alert("Book selection  saved");
+                
+            }
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                alert(errorMessage.message);
+                throw new Error(`Failed to confirm book: ${errorMessage.message}`);
+            }
+
+            const confirmedBook = await response.json();
+
+            setBooks((prevBooks) =>
+                prevBooks.map((b) => {
+                    if (b._id === confirmedBook._id) {
+                        return {
+                            ...b,
+                            confirmed: true,
+                        };
+                    }
+                    return b;
+                })
+            );
+        } catch (error) {
+            console.error('Error confirming book:', error);
         }
     };
 
@@ -94,9 +139,17 @@ function FunctionalComBook() {
                             <td>
                                 <button
                                     onClick={() => handleToggleSelectBook(book)}
+                                    disabled={book.confirmed}
                                 >
                                     {book.status === 'available' ? 'Select' : 'Unselect'}
                                 </button>
+                                {!book.confirmed && (
+                                    <button
+                                        onClick={() => handleConfirmBook(book)}
+                                    >
+                                        Confirm
+                                    </button>
+                                )}
                             </td>
                         </tr>
                     ))}

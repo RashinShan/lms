@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import './css/bookUpdate.css';
 import bookImage from './css/book1.jfif'; // Import the image
 
 function FunctionalComUpdateBook() {
+    const { bookId } = useParams();
+
     const [book, setBook] = useState({
         title: '',
         author: '',
@@ -17,15 +20,33 @@ function FunctionalComUpdateBook() {
         setBook({ ...book, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Add logic to handle book update, e.g., sending data to a server
-        console.log('Book updated:', book);
-        setMessage('Book updated successfully!');
-        // Optionally reset form after update
-        // setBook({ title: '', author: '', copies: '', status: '' });
+        setMessage('');
+    
+        try {
+            const response = await fetch(`http://localhost:4000/booksupdate/${bookId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(book),
+            });
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`Failed to update book: ${errorData.message}`);
+            }
+    
+            const data = await response.json();
+            console.log('Book updated:', data);
+            setMessage('Book updated successfully!');
+        } catch (error) {
+            console.error('Error updating book:', error);
+            setMessage(`Error: ${error.message}`);
+        }
     };
-
+    
     const handleReset = () => {
         setBook({ title: '', author: '', copies: '', status: '' });
         setMessage('');
